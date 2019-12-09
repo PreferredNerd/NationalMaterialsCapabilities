@@ -18,6 +18,7 @@ library(party)
 library(rpart)
 library(rpart.plot)
 library(reticulate)
+library(DataComputing)
 py_discover_config()
 # Read the NMC data in.
 NMC<-readr::read_csv("NMC_5_0.csv")
@@ -102,12 +103,39 @@ summary(sixVectorPredictionOfGDPModel)
 #Since there exists a significance between all of the predictors and GDP, does this mean that GDP is just as good of a measure of states power as CINC score is? Let's proceed by graphing various representation of the two scores and their ability to determine power by metrics as explicated in the CINC codebook.
 ```
 
+```{r}
+#First we are going to use find two states that may be at odds with each other, as contention is defined by power transition theory in the conditional anarchical international system, by looking at diffrent periods in history to see where the highest CINC scores are similar by two disimilar state actor's governance systems. Initially I am thinking communist vs. democratic systems of governance, US, Russa, USSR, China?
 
+# I am going to create a world map graphing function so we can pass year as an argument and a map is produced.
+
+worldMapGraphCINCByYear <- function(passedYear){
+  combinedDataFrame %>%
+    filter(year==passedYear) %>%
+    WorldMap(key = stateabb, fill = cinc)
+}
+
+
+#Choose WWII
+worldMapGraphCINCByYear(1940)
+#Choose Cuban Missle Crisis
+worldMapGraphCINCByYear(1962)
+#Choose Height of Cold War (1962-1979)
+worldMapGraphCINCByYear(1970)
+#Choose Berlin Wall Destruction
+worldMapGraphCINCByYear(1991)
+#Choose Collapse of USSR
+worldMapGraphCINCByYear(1993)
+#Choose 9/11
+worldMapGraphCINCByYear(2001)
+
+#These graphs tell a story of alternating power between US USSR and China. But since we are curious about the future, and given that Russia's CINC fell dramatically, past the point of contention, lets now focus on the apparent fued between the US and China. Between 1991 and 2001 the changing of the hands is quite apparent. We know that how to two state operate is diffrent (governance wise) so lets move on to see when this period of power transition occured. 
+
+```
 
 
 
 ```{r}
-#The first grap[h we are going to make is the power trasisiton period between the United States and China. This has direct iomplications in Power transition theory. As the US is the hegemon of the international system, and China is an approching disatiosfied state (according to the theory of conditional anarchical international fourm). When these two states meet in power, the thoery posits that there will be a war between the two states. According to the current accepted prediction model, the CINC score the graphical illustration follows:
+#The next graph we are going to make is the power trasisiton period between the United States and China. This has direct implications in Power transition theory. As the US is the hegemon of the international system, and China is an approching disatiosfied state (according to the theory of conditional anarchical international fourm). When these two states meet in power, the thoery posits that there will be a war between the two states. According to the current accepted prediction model, the CINC score the graphical illustration follows:
 datesBeyond1960 %>%
   filter(stateabb %in% c("USA", "CHN")) %>%
   select(stateabb, year, cinc) %>%
