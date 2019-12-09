@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Corrolates of War Final Project"
 output: html_notebook
 ---
  
@@ -129,6 +129,31 @@ worldMapGraphCINCByYear(1993)
 worldMapGraphCINCByYear(2001)
 
 #These graphs tell a story of alternating power between US USSR and China. But since we are curious about the future, and given that Russia's CINC fell dramatically, past the point of contention, lets now focus on the apparent fued between the US and China. Between 1991 and 2001 the changing of the hands is quite apparent. We know that how to two state operate is diffrent (governance wise) so lets move on to see when this period of power transition occured. 
+
+
+
+determineWhichCincHigher <- function(state1, state2, passedYear){
+    selection<-
+      NMC %>%
+      select(year, stateabb, cinc) %>%
+      filter(stateabb == country1 || stateabb = country2) %>%
+      filter(year == passedYear)
+    
+    countryOneScore <-
+      selection %>%
+      filter(statebb == country1)
+    
+    countryTwoScore <-
+      selection %>%
+      filter(statebb == country2)
+    
+    if(countryOneScore > countryTwoScore){
+      return (state1)
+    }else{
+      return (state2)
+    }
+  
+}
 
 ```
 
@@ -289,6 +314,10 @@ NMC %>%
 return (result)  
 
 }
+
+
+
+
 ```
 
 Since 1993, there has been a spike in military expenditure in the United States. The difference between the expenditure of these two years in thosand U.S Dollars:
