@@ -4,7 +4,7 @@ output: html_notebook
 ---
  
 
-```{r}
+```{r message=FALSE}
 # clean up workspace environment
 rm(list = ls())
 
@@ -19,7 +19,7 @@ library(rpart)
 library(rpart.plot)
 library(reticulate)
 library(DataComputing)
-py_discover_config()
+
 # Read the NMC data in.
 NMC<-readr::read_csv("NMC_5_0.csv")
 
@@ -33,11 +33,12 @@ head(WBD)
 nrow(NMC)
 nrow(WBD)
 ```
-#Research Question
-## Using Power Transition Theory, which method of measuring state actor power best predicts the outcome of the proposed conflict between China and The United States?  
+Research Question
+
+Using Power Transition Theory, which method of measuring state actor (country) power best predicts the outcome of the proposed conflict between China and The United States?  
 
 
-## Select only the important variables from World Bank that we care about. Note that GDP is in USD. And that year only goes up to 2012 in NMC, select until then.
+## Select only the important variables from World Bank that we care about. Note that GDP is in USD and year is only available until 2012 in NMC. We will select until that date.
 ```{python}
 # Use Python to return us a list of column names from 1960 to 2012 in string format so that we can wrangle our data easier down below. Note that the for loop ends one year higher, becasue python uses the stop at for method.
 selectionList = ["Country Code"]
@@ -46,7 +47,7 @@ for currentDate in range (1960, 2013):
 ```
 
 ```{r}
-# Pass the selection list from our Python enviroment. Note it automatically translate it as a vecorized list "c()" in our R enviroment.
+# Pass the selection list from our Python enviroment. Note it automatically translates it as a vecorized list "c()" in our R enviroment.
 WBD <-
   WBD %>%
   select(py$selectionList)
@@ -85,7 +86,7 @@ combinedDataFrame <-
 ```
 
 ```{r}
-# Next I think it would be interesting to determine how well the six elements that comprise the CINC score and the score it self predict GDP via simple linear model.
+# Next I think it would be interesting to determine how well the six elements that comprise the CINC score and the score itself predict GDP via a simple linear model.
 
 #Select only dates from 1960 and beyond to eliminate N/A results
 datesBeyond1960 <-
@@ -98,20 +99,21 @@ sixVectorPredictionOfGDPModel <-
   lm(GDP ~ milex + milper + irst + pec + tpop + upop, data=.)
 
 summary(sixVectorPredictionOfGDPModel)
-#It shows that all six vectors are statistically signifigant therefore providing grounds to reject the Null based upon the determined signifigace.
+#The summary model shows that all six vectors are statistically signifigant therefore providing grounds to reject the Null based upon the determined signifigace.
 
 #Since there exists a significance between all of the predictors and GDP, does this mean that GDP is just as good of a measure of states power as CINC score is? Let's proceed by graphing various representation of the two scores and their ability to determine power by metrics as explicated in the CINC codebook.
 ```
 
-```{r}
-#First we are going to use find two states that may be at odds with each other, as contention is defined by power transition theory in the conditional anarchical international system, by looking at diffrent periods in history to see where the highest CINC scores are similar by two disimilar state actor's governance systems. Initially I am thinking communist vs. democratic systems of governance, US, Russa, USSR, China?
+```{r message=FALSE, warning=FALSE}
+#First we are going to use find two states that may be at odds with each other, as contention is defined by power transition theory in the conditional anarchical international system, by looking at diffrent periods in history to see where the highest CINC scores are similar by two disimilar state actor's governance systems. Initially I am thinking communist vs. democratic systems of governance, US, Russia, USSR, China?
 
 # I am going to create a world map graphing function so we can pass year as an argument and a map is produced.
 
 worldMapGraphCINCByYear <- function(passedYear){
   combinedDataFrame %>%
     filter(year==passedYear) %>%
-    WorldMap(key = stateabb, fill = cinc)
+    WorldMap(key = stateabb, fill = cinc) +
+    ggtitle(paste("CINC Distribution in", passedYear))
 }
 
 
@@ -128,7 +130,7 @@ worldMapGraphCINCByYear(1993)
 #Choose 9/11
 worldMapGraphCINCByYear(2001)
 
-#These graphs tell a story of alternating power between US USSR and China. But since we are curious about the future, and given that Russia's CINC fell dramatically, past the point of contention, lets now focus on the apparent fued between the US and China. Between 1991 and 2001 the changing of the hands is quite apparent. We know that how to two state operate is diffrent (governance wise) so lets move on to see when this period of power transition occured. 
+#These graphs tell a story of alternating power between US, USSR and China. But since we are curious about the future, and given that Russia's CINC fell dramatically, past the point of contention, lets now focus on the apparent fued between the US and China. Between 1991 and 2001 the changing of the hands is quite apparent. We know that how to two state operate is diffrent (governance wise) so lets move on to see when this period of power transition occured. 
 
 
 
@@ -136,7 +138,7 @@ determineWhichCincHigher <- function(state1, state2, passedYear){
     selection<-
       NMC %>%
       select(year, stateabb, cinc) %>%
-      filter(stateabb == country1 || stateabb = country2) %>%
+      filter(stateabb == country1 || stateabb == country2) %>%
       filter(year == passedYear)
     
     countryOneScore <-
@@ -192,7 +194,7 @@ datesBeyond1960 %>%
 # Because these graphs tell two diffrent stories, we should have been at war with China in 1993, or war with China is approaching in the near future, we need to examine war potential by taking the diffrence of the cinc scores and GDP to determine a valid determination of how likley war is. From that we will make two dendrogram models with each of the 6 metrics to determine US war liklihood by virtue of value of each of those scores. If we take a look at the derivatives of each state's measure of power with GDP, we see that the US' has a smaller dt, therefore, China will intersect with the US's GDP in the future.
 
 ```
-```{r}
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 # Calculate us cinc by year.
 usaCincYear <-
 datesBeyond1960 %>%
@@ -264,8 +266,9 @@ prp(usWarPotentialByCincVectorsModel)
 
 ```
 
-Find the average military expenditure of countries since from the beginning of the dataset. Notice that there are spikes in military expenditure during WWI (1917), US joins WWII (1941) (growth in milex grows rapidly each year after), Begining of Vietnam War (1955), Peak of cold war and local minima after fall of USSR (1993), attacks on Sept. 11 2001 (2002 budgetary information). This demonstrates that everytime the United States' entered a war, it has had a direct impact on the average military expenditure of the world. 
+
 ```{r}
+#Find the average military expenditure of countries since from the beginning of the dataset. Notice that there are spikes in military expenditure during WWI (1917), US joins WWII (1941) (growth in milex grows rapidly each year after), Begining of Vietnam War (1955), Peak of cold war and local minima after fall of USSR (1993), attacks on Sept. 11 2001 (2002 budgetary information). This demonstrates that everytime the United States' entered a war, it has had a direct impact on the average military expenditure of the world. 
 NMC %>%
   select(stateabb, year, milex) %>%
   group_by(year) %>%
@@ -282,8 +285,9 @@ NMC %>%
   
 
 ```
-Interestingly Enough if we run the same operation, except this time removing the United States, we can begin to notice that these verticle bars which have deeply rooted signifigance in the United States, still hold great meaning, i.e. the world's overall are MILEX matches with US; thus demonstrating the signifigance of impact the US has on the world military expenditures -- or the world setting the tone for US milex. NOTE: the y limit droped by a factor of 10^2 thousand dollars when we removed the United States!
+
 ```{r}
+#Interestingly Enough if we run the same operation, except this time removing the United States, we can begin to notice that these verticle bars which have deeply rooted signifigance in the United States, still hold great meaning, i.e. the world's overall are MILEX matches with US; thus demonstrating the signifigance of impact the US has on the world military expenditures -- or the world setting the tone for US milex. NOTE: the y limit droped by a factor of 10^2 thousand dollars when we removed the United States!
 NMC %>%
   select(stateabb, year, milex) %>%
   filter(stateabb != "USA") %>%
@@ -327,8 +331,9 @@ year2012MilEx <- determineUSMilitaryExpenditure(2012)
 (year2012MilEx - year1993MilEx)
 ```
 
-Even though the military expenditure has went up over the course of that time, there is a strong negative association between the funds and military personelle. If a larger military expenditure does not mean more military personelle, than that leads us to question what we are spending our money on.
+
 ```{r}
+#Even though the military expenditure has went up over the course of that time, there is a strong negative association between the funds and military personelle. If a larger military expenditure does not mean more military personelle, than that leads us to question what we are spending our money on.
 milper<-
 NMC%>%
   select(year, milper) %>%
@@ -349,8 +354,9 @@ NMC%>%
 cor(milex, milper, method = c("pearson"))
 ```
 
-I'm curious to run a regression model to see the signifigance of all the six parts that have the most impact on CINC Score.
-```{r}
+
+```{r message=FALSE, warning=FALSE}
+#I'm curious to run a regression model to see the signifigance of all the six parts that have the most impact on CINC Score.
 head(NMC)
 forModel <-
 NMC %>%
@@ -366,4 +372,4 @@ summary(modLM)
 rpart.plot::prp(modTree)
 
 ```
-
+From these graphics, it can be resonably determiend that CINC and GDP measure the same quantity. Perhaps the problem is not how we operationalize power, but rather that there is something wrong with the theory -- perhaps an alternate explination is that China is content with the status quo, and that is why they have not challenged the United States. Until we can operationalize state discontentment, we will have to settle with this conclusion.
