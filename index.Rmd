@@ -44,6 +44,7 @@ Using Power Transition Theory, which method of measuring state actor (country) p
 
 # Begining of Project
 Let's start by select only the important variables from World Bank that we care about. Note that GDP is in USD and year is only available until 2012 in NMC. We will select until that date.
+
 ```{python}
 # Use Python to return us a list of column names from 1960 to 2012 in string format so that we can wrangle our data easier down below. Note that the for loop ends one year higher, becasue python uses the stop at for method.
 selectionList = ["Country Code"]
@@ -372,6 +373,46 @@ To answer the research question directly, which of the two is better for predict
 
 # Additional Honors Option Section
 ### Linear Regression of CINC as a Prediction of War Potential
+
+~~~ Python Code ~~~
+
+import pandas as pd  
+import numpy as np  
+import matplotlib.pyplot as plt  
+import seaborn as seabornInstance 
+from sklearn.model_selection import train_test_split 
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+
+dataset = r.datesBeyond1960
+dataset.plot(x='cinc',y='GDP', style='o')
+
+#seabornInstance.distplot(dataset['usWarPotentialCINC'])
+#CINC on GDP
+X = dataset['cinc'].values.reshape(-1,1)
+y = dataset['usWarPotentialCINC'].values.reshape(-1,1)
+
+#Spilt 80% into training and 20% into test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+regressor = LinearRegression()  
+regressor.fit(X_train, y_train) #training the algorithm
+
+#To retrieve the intercept:
+print(regressor.intercept_)
+#For retrieving the slope:
+print(regressor.coef_)
+
+y_pred = regressor.predict(X_test)
+df = pd.DataFrame({'Actual': y_test.flatten(), 'Predicted': y_pred.flatten()})
+
+#Print out graphic of predicted vs. actual value for war potential graphic. 
+plt.scatter(X_test, y_test,  color='gray')
+plt.plot(X_test, y_pred, color='red', linewidth=2)
+plt.show()
+
+~~~ End Python Code~~~
+
 ```{python}
 import pandas as pd  
 import numpy as np  
