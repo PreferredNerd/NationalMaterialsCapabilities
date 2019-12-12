@@ -365,6 +365,11 @@ rpart.plot::prp(modTree)
 ```
 From these graphics, it can be resonably determiend that CINC and GDP measure the same quantity. Perhaps the problem is not how we operationalize power, but rather that there is something wrong with the theory -- perhaps an alternate explination is that China is content with the status quo, and that is why they have not challenged the United States. Until we can operationalize state discontentment, we will have to settle with this conclusion.
 
+# CINC Is The Superior Measure of State Power
+To answer the research question directly, which of the two is better for predicting state power, I would argue that the Corrolates of War's Composite Index of National Capabilities is. For in making decision trees, and graphics, these additional six variables are all statistically signifigant. Becasue there are additional vecotrs of measurement represented as a world share percentage, it gives a clear ranking of states place in the itnernational system over time. This assesment is based on a complete Exploratory Data Analysis, with graphics used to help guide this research and drive home this conclusion.
+
+***
+
 # Additional Honors Option Section
 ### Linear Regression of CINC as a Prediction of War Potential
 ```{python}
