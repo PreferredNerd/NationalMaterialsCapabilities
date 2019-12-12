@@ -1,9 +1,10 @@
 ---
 title: "Corrolates of War Final Project"
+author: "Analysis By: Nicholas C. Birosik"
 output: html_notebook
 ---
- 
-
+***
+### Prepare the R enviroment. Clean workspace, import required libraries, import and inspect required data.
 ```{r message=FALSE}
 # clean up workspace environment
 rm(list = ls())
@@ -33,12 +34,16 @@ head(WBD)
 nrow(NMC)
 nrow(WBD)
 ```
-#Research Question
+
+
+
+
+# Research Question
 
 Using Power Transition Theory, which method of measuring state actor (country) power best predicts the outcome of the proposed conflict between China and The United States?  
 
-#Work
-Select only the important variables from World Bank that we care about. Note that GDP is in USD and year is only available until 2012 in NMC. We will select until that date.
+# Begining of Project
+Let's start by select only the important variables from World Bank that we care about. Note that GDP is in USD and year is only available until 2012 in NMC. We will select until that date.
 ```{python}
 # Use Python to return us a list of column names from 1960 to 2012 in string format so that we can wrangle our data easier down below. Note that the for loop ends one year higher, becasue python uses the stop at for method.
 selectionList = ["Country Code"]
@@ -54,7 +59,6 @@ WBD <-
 
 # Inspect Resulting Dataset
 head(WBD)
-
 ```
 
 ```{r}
@@ -81,8 +85,6 @@ WBD$year <- as.numeric(WBD$year)
 combinedDataFrame <-
   NMC %>%
   left_join(WBD, by = c("year"="year","stateabb"="stateabb"))
-
-
 ```
 
 ```{r}
@@ -99,11 +101,12 @@ sixVectorPredictionOfGDPModel <-
   lm(GDP ~ milex + milper + irst + pec + tpop + upop, data=.)
 
 summary(sixVectorPredictionOfGDPModel)
-# The summary model shows that all six vectors are statistically signifigant therefore providing grounds to reject the Null based upon the determined signifigace.
-
-# Since there exists a significance between all of the predictors and GDP, does this mean that GDP is just as good of a measure of states power as CINC score is? Let's proceed by graphing various representation of the two scores and their ability to determine power by metrics as explicated in the CINC codebook.
 ```
+The summary model shows that all six vectors are statistically signifigant therefore providing grounds to reject the Null based upon the determined signifigace.
 
+Since there exists a significance between all of the predictors and GDP, does this mean that GDP is just as good of a measure of states power as CINC score is? Let's proceed by graphing various representation of the two scores and their ability to determine power by metrics as explicated in the CINC codebook.
+
+# Predicting interstate conflict among Hegemon and Rising Power
 First we are going to use find two states that may be at odds with each other, as contention is defined by power transition theory in the conditional anarchical international system, by looking at diffrent periods in history to see where the highest CINC scores are similar by two disimilar state actor's governance systems. Initially I am thinking communist vs. democratic systems of governance, US, Russia, USSR, China?
 ```{r message=FALSE, warning=FALSE}
 # I am going to create a world map graphing function so we can pass year as an argument and a map is produced.
@@ -154,12 +157,12 @@ determineWhichCincHigher <- function(state1, state2, passedYear){
     }else{
       return (state2)
     }
-  
 }
-
 ```
 
-The next graph we are going to make is the power trasisiton period between the United States and China. This has direct implications in Power transition theory. As the US is the hegemon of the international system, and China is an approching disatiosfied state (according to the theory of conditional anarchical international fourm). When these two states meet in power, the thoery posits that there will be a war between the two states. According to the current accepted prediction model, the CINC score the graphical illustration follows:
+# Graphing Measures of US and China State Power 
+### By GDP and CINC (our comparision models)
+The next graph we are going to make is the power trasititon period between the United States and China. This has direct implications in Power transition theory. As the US is the hegemon of the international system, and China is an approching disatiosfied state (according to the theory of conditional anarchical international fourm). When these two states meet in power, the thoery posits that there will be a war between the two states. According to the current accepted prediction model, the CINC score the graphical illustration follows:
 
 ```{r}
 datesBeyond1960 %>%
@@ -191,7 +194,7 @@ datesBeyond1960 %>%
   ylab("Composite Index of National Capabilities")
 ```
 
-Because these graphs tell two diffrent stories, we should have been at war with China in 1993, or war with China is approaching in the near future, we need to examine war potential by taking the diffrence of the cinc scores and GDP to determine a valid determination of how likley war is. From that we will make two dendrogram models with each of the 6 metrics to determine US war liklihood by virtue of value of each of those scores. If we take a look at the derivatives of each state's measure of power with GDP, we see that the US' has a smaller dt, therefore, China will intersect with the US's GDP in the future.
+Because these graphs tell two diffrent stories: we should have been at war with China in 1993, or war with China is approaching in the near future, we need to examine war potential by taking the diffrence of the cinc scores and GDP to determine a valid determination of how likley war is. From that we will make two dendrogram models with each of the 6 metrics to determine US war liklihood by virtue of value of each of those scores. If we take a look at the derivatives of each state's measure of power with GDP, we see that the US' has a smaller dt, therefore, China will intersect with the US's GDP in the future.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 # Calculate us cinc by year.
@@ -260,17 +263,11 @@ usWarPotentialByCincVectorsModel <-
 
 # Note that a retruned number of zero indicates what the theory positis should be a period of war. A negative number means that that war period has been entered. Larger numbers are in the US' favor to stay out of war; take a look at the left most leaf for factors that are most liley to lead to war by a factor of 10^3 by GDP metrics.
 prp(usWarPotentialByCincVectorsModel)
-
-
-
 ```
 
-
-
-
+# Explore changes in world military expenditure
 Next Find the average military expenditure of countries since from the beginning of the dataset. Notice that there are spikes in military expenditure during WWI (1917), US joins WWII (1941) (growth in milex grows rapidly each year after), Begining of Vietnam War (1955), Peak of cold war and local minima after fall of USSR (1993), attacks on Sept. 11 2001 (2002 budgetary information). This demonstrates that everytime the United States' entered a war, it has had a direct impact on the average military expenditure of the world. 
 ```{r}
-
 NMC %>%
   select(stateabb, year, milex) %>%
   group_by(year) %>%
@@ -284,8 +281,6 @@ NMC %>%
   geom_vline(xintercept = 1955) +
   geom_vline(xintercept = 1993) +
   geom_vline(xintercept = 2002) 
-  
-
 ```
 Interestingly Enough if we run the same operation, except this time removing the United States, we can begin to notice that these verticle bars which have deeply rooted signifigance in the United States, still hold great meaning, i.e. the world's overall are MILEX matches with US; thus demonstrating the signifigance of impact the US has on the world military expenditures -- or the world setting the tone for US milex. NOTE: the y limit droped by a factor of 10^2 thousand dollars when we removed the United States!
 ```{r}
@@ -303,7 +298,6 @@ NMC %>%
   geom_vline(xintercept = 1955) +
   geom_vline(xintercept = 1993) +
   geom_vline(xintercept = 2002)
-
 ```
 
 
@@ -321,7 +315,6 @@ NMC %>%
 return (result)  
 
 }
-
 ```
 
 Since 1993, there has been a spike in military expenditure in the United States. The difference between the expenditure of these two years in thosand U.S Dollars:
@@ -369,6 +362,5 @@ modTree <-
 
 summary(modLM)
 rpart.plot::prp(modTree)
-
 ```
 From these graphics, it can be resonably determiend that CINC and GDP measure the same quantity. Perhaps the problem is not how we operationalize power, but rather that there is something wrong with the theory -- perhaps an alternate explination is that China is content with the status quo, and that is why they have not challenged the United States. Until we can operationalize state discontentment, we will have to settle with this conclusion.
