@@ -50,6 +50,7 @@ Let's start by select only the important variables from World Bank that we care 
 selectionList = ["Country Code"]
 for currentDate in range (1960, 2013):
   selectionList.append(str(currentDate))
+print("Python created our selection list Array")
 ```
 
 ```{r}
